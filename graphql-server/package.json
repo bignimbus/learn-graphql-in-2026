@@ -1,5 +1,5 @@
 {
-  "name": "apollo-server",
+  "name": "graphql-server",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,10 +7,10 @@
     "start": "node --watch --watch-path=./schema.graphql --watch-path=./resolvers.ts --watch-path=./index.ts --experimental-strip-types --no-warnings=ExperimentalWarning index.ts"
   },
   "dependencies": {
-    "@apollo/server": "^5.0.0",
-    "graphql": "^16.9.0",
-    "graphiql": "^3.7.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@apollo/server": "^5.5.1",
+    "graphql": "^16.14.0",
+    "graphiql": "^5.2.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6"
   }
 }
