@@ -16,6 +16,7 @@
     "start": "concurrently --names service-1,service-2,graphql,intro --prefix-colors blue,green,magenta,yellow \"npm run service-1\" \"npm run service-2\" \"npm run graphql-server\" \"npm run intro\""
   },
   "devDependencies": {
+    "@types/node": "^25.6.2",
     "concurrently": "^9.1.0"
   }
 }
