@@ -1,0 +1,21 @@
+{
+  "name": "learn-graphql-in-2026",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "service-1",
+    "service-2",
+    "apollo-server",
+    "talk-intro"
+  ],
+  "scripts": {
+    "service-1": "npm --workspace service-1 start",
+    "service-2": "npm --workspace service-2 start",
+    "apollo": "npm --workspace apollo-server start",
+    "intro": "npm --workspace talk-intro start",
+    "start": "concurrently --names service-1,service-2,apollo,intro --prefix-colors blue,green,magenta,yellow \"npm run service-1\" \"npm run service-2\" \"npm run apollo\" \"npm run intro\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
