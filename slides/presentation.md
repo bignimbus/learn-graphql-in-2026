@@ -1,22 +1,38 @@
 ---
-title: Teach Yourself GraphQL in 2026
-sub_title: An Anti-blueprint
+title: Teach yourself GraphQL in 2026
+sub_title: an anti-blueprint
 author: Jeff Auriemma
 theme:
-  name: dark
+  name: terminal-dark
 ---
+
+# Why we're here
+
+🤔
+
+<!-- end_slide -->
+
+# Why we're here
+
+We want to make...
+
+- better user experiences
+- better apps
+- better agents
+
+**GraphQL** is the investment to make in 2026
 
 <!-- end_slide -->
 
 # The dream query
 
+<!-- column_layout: [1, 1] -->
+
+<!-- column: 0 -->
+
 ```graphql
 query FlightSearch {
-  flights(
-    origin: "JFK"
-    destination: "LHR"
-    date: "2026-06-01"
-  ) {
+  flights(origin: "JFK", destination: "LHR", date: "2026-06-01") {
     airline
     departureTime
     arrivalTime
@@ -31,6 +47,12 @@ query FlightSearch {
   }
 }
 ```
+
+<!-- column: 1 -->
+
+A GraphQL query that contains an ideal representation of the data needed to create a full user experience
+
+<!-- reset_layout -->
 
 <!-- end_slide -->
 
@@ -60,7 +82,7 @@ query FlightSearch {
 
 **field** — a named piece of data
 
-**argument** — filters or parameterizes a field
+**argument** — parameterizes a field
 
 **selection set** — `{ }` — describes the shape you want back
 
@@ -70,7 +92,97 @@ query FlightSearch {
 
 <!-- new_line -->
 
-The response mirrors the shape of the query. Exactly.
+The response mirrors the shape of the query.
+
+<!-- end_slide -->
+
+# Introducing myself
+
+<!-- column_layout: [1, 1] -->
+
+<!-- column: 0 -->
+
+```graphql
+query TalkIntro {
+  me {
+    name
+    title
+    company
+    bio
+    socials {
+      github
+      bluesky
+      linkedin
+    }
+  }
+}
+```
+
+<!-- column: 1 -->
+
+![](headshot.jpeg)
+
+<!-- reset_layout -->
+
+<!-- end_slide -->
+
+# GraphQL is
+
+<!-- end_slide -->
+
+# GraphQL is
+
+... just a spec
+
+:(
+
+<!-- end_slide -->
+
+# GraphQL is
+
+... just a spec
+
+:)
+
+<!-- end_slide -->
+
+# GraphQL is
+
+- "just" a spec
+- a means of expressing your domain objects
+- a way to get new experiences, apps, and agents off the ground quickly
+
+<!-- end_slide -->
+
+# Learn GraphQL in 2026
+
+## an anti-blueprint
+
+This talk...
+
+- is spontaneous and social
+- focuses on basics and questions, not complexity and answers
+- uses a prompt-driven narrative to match modern dev practices
+
+<!-- end_slide -->
+
+# Make the dream a reality
+
+<!-- end_slide -->
+
+# Schema
+
+(show schema example here)
+
+<!-- end_slide -->
+
+# Resolvers
+
+(show resolver example here)
+
+<!-- end_slide -->
+
+# Schema & Resolvers
 
 <!-- end_slide -->
 
@@ -102,7 +214,10 @@ Parameterize an operation — separate the document from the runtime values.
 ```graphql
 mutation BookFlight($flightId: ID!, $passengerId: ID!) {
   bookFlight(flightId: $flightId, passengerId: $passengerId) {
-    booking { id status }
+    booking {
+      id
+      status
+    }
   }
 }
 ```
@@ -126,9 +241,13 @@ mutation BookFlight($flightId: ID!, $passengerId: ID!) {
 query FlightSearch {
   flights(origin: "JFK") {
     airline
-    departureTime    # ← who renders this?
-    legs { airport } # ← who renders this?
-    price { amount } # ← who renders this?
+    departureTime # ← who renders this?
+    legs {
+      airport
+    } # ← who renders this?
+    price {
+      amount
+    } # ← who renders this?
   }
 }
 ```
@@ -140,25 +259,6 @@ This query already has a shape.
 Different fields will be rendered by different UI components.
 
 There's a concept that formalizes exactly that relationship. Later.
-
-<!-- end_slide -->
-
-# Introducing myself
-
-```graphql
-query TalkIntro {
-  me {
-    name
-    title
-    company
-    socials {
-      twitter
-      github
-    }
-    bio
-  }
-}
-```
 
 <!-- end_slide -->
 
@@ -251,11 +351,11 @@ AI marks everything `!` optimistically, or leaves everything nullable lazily.
 const resolvers = {
   Query: {
     flights: async (_, args) => {
-      const res = await fetch(`http://service-1/flights`)
-      return res.json()
-    }
-  }
-}
+      const res = await fetch(`http://service-1/flights`);
+      return res.json();
+    },
+  },
+};
 ```
 
 <!-- new_line -->
@@ -344,7 +444,10 @@ fragment FlightDetails on Flight {
   origin
   destination
   departureTime
-  legs { airport duration }
+  legs {
+    airport
+    duration
+  }
 }
 ```
 
@@ -352,13 +455,18 @@ fragment FlightDetails on Flight {
 query FlightSearch {
   flights(origin: "JFK") {
     ...FlightDetails
-    price { amount currency }
+    price {
+      amount
+      currency
+    }
   }
 }
 
 mutation BookFlight($flightId: ID!, $passengerId: ID!) {
   bookFlight(flightId: $flightId, passengerId: $passengerId) {
-    flight { ...FlightDetails }
+    flight {
+      ...FlightDetails
+    }
   }
 }
 ```
@@ -396,7 +504,7 @@ Input types look like object types but only flow one direction — **into** the 
 
 Query
 **Mutation** ←
-Subscription *
+Subscription \*
 
 <!-- column: 1 -->
 
@@ -453,7 +561,7 @@ Code-first
 
 Object type
 Scalar
-**Enum** ← *
+**Enum** ← \*
 **Interface** ←
 **Union** ←
 **Input type** ←
@@ -488,14 +596,17 @@ Lighthouse (PHP/Laravel)
 
 for clients
 
-describes what you *want*
+describes what you _want_
 
 ```graphql
 query FlightSearch {
   flights(origin: "JFK") {
     airline
     departureTime
-    price { amount currency }
+    price {
+      amount
+      currency
+    }
   }
 }
 ```
@@ -506,7 +617,7 @@ query FlightSearch {
 
 for servers
 
-defines what's *possible*
+defines what's _possible_
 
 ```graphql
 type Query {
@@ -593,7 +704,10 @@ Each component owns the fields it needs to render.
 
 ```graphql
 fragment PriceBadge_flight on Flight {
-  price { amount currency }
+  price {
+    amount
+    currency
+  }
 }
 
 fragment FlightCard_flight on Flight {
@@ -632,7 +746,7 @@ When `PriceBadge` changes, one fragment changes. Nothing else breaks.
 
 # Further reading
 
-*[QR codes]*
+_[QR codes]_
 
 <!-- new_line -->
 

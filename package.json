@@ -14,7 +14,7 @@
     "graphql-server": "npm --workspace graphql-server start",
     "intro": "npm --workspace talk-intro start",
     "start": "concurrently --names service-1,service-2,graphql,intro --prefix-colors blue,green,magenta,yellow \"npm run service-1\" \"npm run service-2\" \"npm run graphql-server\" \"npm run intro\"",
-    "slides": "presenterm slides/presentation.md"
+    "slides": "presenterm slides/presentation.md --config-file slides/config.yaml"
   },
   "devDependencies": {
     "@types/node": "^25.6.2",

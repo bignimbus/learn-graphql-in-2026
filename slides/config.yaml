@@ -1,0 +1,4 @@
+defaults:
+  validate_overflows: never
+mermaid:
+  scale: 4

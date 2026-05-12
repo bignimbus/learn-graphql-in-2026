@@ -1,9 +1,9 @@
-import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import fs from 'node:fs';
-import path from 'node:path';
-import { createRequire } from 'node:module';
-import { me } from './data.ts';
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import fs from "node:fs";
+import path from "node:path";
+import { createRequire } from "node:module";
+import { me } from "./data.ts";
 
 const PORT = 4001;
 
@@ -21,7 +21,8 @@ const typeDefs = `#graphql
   }
 
   type Socials {
-    twitter: String!
+    bluesky: String!
+    linkedin: String!
     github: String!
   }
 `;
@@ -33,8 +34,8 @@ const resolvers = {
 };
 
 const graphiqlHtml = buildGraphiqlHtml({
-  title: 'GraphiQL — talk-intro',
-  endpoint: '/',
+  title: "GraphiQL — talk-intro",
+  endpoint: "/",
 });
 
 const graphiqlPlugin = {
@@ -65,16 +66,16 @@ function buildGraphiqlHtml(opts: { title: string; endpoint: string }): string {
   const require = createRequire(import.meta.url);
   const pkgDir = (pkg: string) =>
     path.dirname(require.resolve(`${pkg}/package.json`));
-  const read = (file: string) => fs.readFileSync(file, 'utf-8');
+  const read = (file: string) => fs.readFileSync(file, "utf-8");
 
   const reactJs = read(
-    path.join(pkgDir('react'), 'umd/react.production.min.js'),
+    path.join(pkgDir("react"), "umd/react.production.min.js"),
   );
   const reactDomJs = read(
-    path.join(pkgDir('react-dom'), 'umd/react-dom.production.min.js'),
+    path.join(pkgDir("react-dom"), "umd/react-dom.production.min.js"),
   );
-  const graphiqlJs = read(path.join(pkgDir('graphiql'), 'graphiql.min.js'));
-  const graphiqlCss = read(path.join(pkgDir('graphiql'), 'graphiql.min.css'));
+  const graphiqlJs = read(path.join(pkgDir("graphiql"), "graphiql.min.js"));
+  const graphiqlCss = read(path.join(pkgDir("graphiql"), "graphiql.min.css"));
 
   return `<!DOCTYPE html>
 <html lang="en">

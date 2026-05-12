@@ -1,10 +1,11 @@
 export const me = {
-  name: 'Jeff Auriemma',
-  title: 'PLACEHOLDER — update before talk',
-  company: 'Apollo GraphQL',
+  name: "Jeff Auriemma",
+  title: "Senior Engineering Manager",
+  company: "Apollo GraphQL",
+  bio: "Dad, distance runner, amateur baker.  Serves the developer community in the GraphQL Foundation, as a GraphQL Ambassador, and in the Agentic AI Foundation.",
   socials: {
-    twitter: 'PLACEHOLDER',
-    github: 'PLACEHOLDER',
+    bluesky: "@jeff.auriemma.xyz",
+    linkedin: "jeffreyauriemma",
+    github: "@bignimbus",
   },
-  bio: 'PLACEHOLDER — update before talk',
 };
