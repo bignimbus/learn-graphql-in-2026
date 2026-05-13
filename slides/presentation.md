@@ -2,9 +2,13 @@
 title: Teach yourself GraphQL in 2026
 sub_title: an anti-blueprint
 author: Jeff Auriemma
-theme:
-  name: terminal-dark
 ---
+
+# TODO
+
+1. Mermaid screenshots
+2. Practice, do dry runs, create a branch incrementally
+3. Fill in blank sections, particularly at the end
 
 # Why we're here
 
@@ -120,7 +124,7 @@ query TalkIntro {
 
 <!-- column: 1 -->
 
-![](headshot.jpeg)
+![](headshot-1.jpeg)
 
 <!-- reset_layout -->
 
@@ -172,25 +176,134 @@ This talk...
 
 # Schema
 
-(show schema example here)
+<!-- column_layout: [3, 2] -->
+
+<!-- column: 0 -->
+
+```graphql
+type Query {
+  flights(origin: String!, destination: String!, date: String!): [Flight!]!
+}
+
+type Flight {
+  airline: String!
+  departureTime: String!
+  arrivalTime: String!
+  legs: [Leg!]!
+  price: Price
+}
+
+type Leg {
+  airport: String!
+  duration: Int!
+}
+
+type Price {
+  amount: Float!
+  currency: String!
+}
+```
+
+<!-- column: 1 -->
+
+**type** — a named object in your domain
+
+**field** — a typed piece of data on a type
+
+**scalar** — leaf type — `String`, `Int`, `Float`, `Boolean`, `ID`
+
+**`!`** — non-null — the field will always have a value
+
+**`[ ]`** — list
+
+**arguments** — typed inputs declared on a field
+
+<!-- reset_layout -->
+
+<!-- new_line -->
+
+Every field selected in the query has a definition here. The schema defines what's _possible_; the query picks what it _wants_.
 
 <!-- end_slide -->
 
 # Resolvers
 
-(show resolver example here)
+<!-- column_layout: [3, 2] -->
+
+<!-- column: 0 -->
+
+```ruby
+class Types::QueryType < Types::BaseObject
+  field :flights, [Types::FlightType], null: false do
+    argument :origin, String, required: true
+    argument :destination, String, required: true
+    argument :date, String, required: true
+  end
+
+  def flights(origin:, destination:, date:)
+    HTTP.get(
+      "http://service-1/flights",
+      params: { origin:, destination:, date: }
+    ).parse
+  end
+end
+```
+
+<!-- column: 1 -->
+
+**resolver** — a function that returns data for a field
+
+**field** — declared once in the schema, implemented once as a method
+
+**arguments** — arrive as keyword arguments, already typed and validated
+
+**body** — plain runtime code (Ruby in this case) — call a database, a REST API, another service
+
+<!-- reset_layout -->
+
+<!-- new_line -->
+
+The schema says _what_ `flights` returns. The resolver says _how_ to get it. GraphQL doesn't care what's underneath.
 
 <!-- end_slide -->
 
-# Schema & Resolvers
+# Anatomy of a GraphQL request
+
+```mermaid +render
+flowchart LR
+    Client(["Client"]) -->|"query"| Parse["Parse"]
+    Parse --> Validate{"Validate"}
+    Schema[("Schema")] -.-> Validate
+    Validate -->|"invalid"| Response(["{ data, errors }"])
+    Validate -->|"valid"| Execute["Execute<br/>(resolvers)"]
+    Execute --> Response
+    Response --> Client
+```
+
+<!-- new_line -->
+
+**Validate before execute** — bad queries never reach your resolvers.
+
+**Query shape == response shape** — the client picks; the server delivers exactly that.
+
+<!-- end_slide -->
+
+# Changing data with mutations
 
 <!-- end_slide -->
 
 # Mutations
 
+<!-- column_layout: [3, 2] -->
+
+<!-- column: 0 -->
+
 ```graphql
 mutation BookFlight($flightId: ID!, $passengerId: ID!) {
-  bookFlight(flightId: $flightId, passengerId: $passengerId) {
+  bookFlight(
+    flightId: $flightId,
+    passengerId: $passengerId
+  ) {
     booking {
       id
       status
@@ -199,11 +312,51 @@ mutation BookFlight($flightId: ID!, $passengerId: ID!) {
 }
 ```
 
-<!-- new_line -->
+<!-- column: 1 -->
 
 - Same structure as a query — operation type, name, selection set
 - For writes: creates, updates, deletes
 - Returns data too — no need for a follow-up request
+
+<!-- reset_layout -->
+
+<!-- end_slide -->
+
+# Resolving mutations
+
+<!-- column_layout: [3, 2] -->
+
+<!-- column: 0 -->
+
+```go
+func (r *mutationResolver) BookFlight(
+    ctx context.Context,
+    flightID, passengerID string,
+) (*BookFlightPayload, error) {
+    body, _ := json.Marshal(map[string]string{
+        "flightId":    flightID,
+        "passengerId": passengerID,
+    })
+    resp, err := http.Post("http://service-2/bookings", "application/json", bytes.NewReader(body))
+    if err != nil {
+        return nil, err
+    }
+    defer resp.Body.Close()
+
+    var booking Booking
+    json.NewDecoder(resp.Body).Decode(&booking)
+    return &BookFlightPayload{Booking: &booking}, nil
+}
+```
+
+<!-- column: 1 -->
+
+- Not the same as HTTP verbs
+- Still resolvers — plain code, any language (here: Go + gqlgen)
+- Same wiring as a query resolver — just write semantics
+- Return the new state so the client doesn't need a follow-up read
+
+<!-- reset_layout -->
 
 <!-- end_slide -->
 
@@ -213,7 +366,10 @@ Parameterize an operation — separate the document from the runtime values.
 
 ```graphql
 mutation BookFlight($flightId: ID!, $passengerId: ID!) {
-  bookFlight(flightId: $flightId, passengerId: $passengerId) {
+  bookFlight(
+    flightId: $flightId,
+    passengerId: $passengerId
+  ) {
     booking {
       id
       status
@@ -235,526 +391,71 @@ mutation BookFlight($flightId: ID!, $passengerId: ID!) {
 
 <!-- end_slide -->
 
-# Fragments — teaser
+# Learning through schema design
 
-```graphql
-query FlightSearch {
-  flights(origin: "JFK") {
-    airline
-    departureTime # ← who renders this?
-    legs {
-      airport
-    } # ← who renders this?
-    price {
-      amount
-    } # ← who renders this?
-  }
-}
-```
+With your agent...
 
-<!-- new_line -->
-
-This query already has a shape.
-
-Different fields will be rendered by different UI components.
-
-There's a concept that formalizes exactly that relationship. Later.
+1. Try to describe your data
+2. Determine the best way to interact with your systems
+3. Collaborate before committing
+4. Some prefer schema-first, others code-first
 
 <!-- end_slide -->
 
-# Recipe Card: Operations — pass 1
-
-<!-- column_layout: [1, 1, 1] -->
-
-<!-- column: 0 -->
-
-**OPERATION TYPES**
-
-Query
-
-<!-- column: 1 -->
-
-**ANATOMY**
-
-Field
-Selection set
-Argument
-
-<!-- column: 2 -->
-
-**CLIENT TOOLING**
-
-Apollo Client
-urql
-Relay
-TanStack Query + graphql-request
-gql.tada
-Houdini
-─────────────────────
-GraphiQL / Apollo Sandbox
-GraphQL LSP (VS Code)
-
-<!-- reset_layout -->
+# Questions you'll be prompting later
 
 <!-- end_slide -->
 
-# Nullability
+# How should I use fragments?
 
-In most type systems: **non-null by default**, explicitly opt into nullable.
+## Questions you'll be prompting later
 
-In GraphQL: **nullable by default**. `!` opts into non-null.
+```mermaid +render
+flowchart TB
+    Page["<b>FlightSearchPage parent component</b><br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>query FlightSearch($origin: String!, ...) {<br/>&nbsp;&nbsp;flights(origin: $origin, ...) {<br/>&nbsp;&nbsp;&nbsp;&nbsp;...FlightCardFields<br/>&nbsp;&nbsp;&nbsp;&nbsp;...FlightLegsFields<br/>&nbsp;&nbsp;&nbsp;&nbsp;...FlightPriceFields<br/>&nbsp;&nbsp;}<br/>}"]
 
-<!-- new_line -->
+    Card["<b>FlightCard component</b><br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>fragment FlightCardFields on Flight {<br/>&nbsp;&nbsp;airline<br/>&nbsp;&nbsp;departureTime<br/>&nbsp;&nbsp;arrivalTime<br/>}"]
 
-<!-- column_layout: [1, 1] -->
+    Legs["<b>FlightLegs component</b><br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>fragment FlightLegsFields on Flight {<br/>&nbsp;&nbsp;legs {<br/>&nbsp;&nbsp;&nbsp;&nbsp;airport<br/>&nbsp;&nbsp;&nbsp;&nbsp;duration<br/>&nbsp;&nbsp;}<br/>}"]
 
-<!-- column: 0 -->
+    Price["<b>FlightPrice component</b><br/>━━━━━━━━━━━━━━━━━━━━━━━━━━<br/>fragment FlightPriceFields on Flight {<br/>&nbsp;&nbsp;price {<br/>&nbsp;&nbsp;&nbsp;&nbsp;amount<br/>&nbsp;&nbsp;&nbsp;&nbsp;currency<br/>&nbsp;&nbsp;}<br/>}"]
 
-```graphql
-type Flight {
-  origin: String
-  destination: String
-  price: Price
-}
-```
+    Card -.->|colocated · composed| Page
+    Legs -.->|colocated · composed| Page
+    Price -.->|colocated · composed| Page
 
-every field nullable —
-`price` might be `null`,
-but so might `origin`
-
-<!-- column: 1 -->
-
-```graphql
-type Flight {
-  origin: String!
-  destination: String!
-  price: Price
-}
-```
-
-`origin` and `destination` will
-always have a value — `price`
-degrades gracefully if unavailable
-
-<!-- reset_layout -->
-
-<!-- new_line -->
-
-AI marks everything `!` optimistically, or leaves everything nullable lazily.
-**Neither is right. Every `!` is a design decision.**
-
-<!-- end_slide -->
-
-# The resolver
-
-```javascript
-const resolvers = {
-  Query: {
-    flights: async (_, args) => {
-      const res = await fetch(`http://service-1/flights`);
-      return res.json();
-    },
-  },
-};
-```
-
-<!-- new_line -->
-
-A resolver is just a function.
-
-It can call a database, a REST API, a third-party service.
-GraphQL doesn't care what's underneath.
-
-<!-- end_slide -->
-
-# Schema-first vs. code-first
-
-<!-- column_layout: [1, 1] -->
-
-<!-- column: 0 -->
-
-**Schema-first**
-
-Write SDL by hand.
-Generate types and stubs from it.
-
-Tools: GraphQL Code Generator, gql.tada
-
-<!-- column: 1 -->
-
-**Code-first**
-
-Define types in your language.
-SDL is generated from them.
-
-Tools: varies by server library
-
-<!-- reset_layout -->
-
-<!-- new_line -->
-
-A fork, not a right answer. Depends on team and language.
-
-<!-- end_slide -->
-
-# Recipe Card: Schema — pass 1
-
-<!-- column_layout: [1, 1, 1] -->
-
-<!-- column: 0 -->
-
-**SCHEMA CONCEPTS**
-
-Type
-Field
-Nullability (`!`)
-Resolver
-Schema-first
-Code-first
-
-<!-- column: 1 -->
-
-**SDL TYPES**
-
-Object type
-Scalar
-
-<!-- column: 2 -->
-
-**SERVERS BY LANGUAGE**
-
-Apollo Server / Yoga (JS/TS)
-Hot Chocolate (.NET)
-Strawberry / Ariadne (Python)
-gqlgen (Go)
-graphql-ruby (Ruby)
-Juniper (Rust)
-Lighthouse (PHP/Laravel)
-
-<!-- reset_layout -->
-
-<!-- end_slide -->
-
-# Fragments — DRY
-
-Same fields appearing in two operations:
-
-```graphql
-fragment FlightDetails on Flight {
-  origin
-  destination
-  departureTime
-  legs {
-    airport
-    duration
-  }
-}
-```
-
-```graphql
-query FlightSearch {
-  flights(origin: "JFK") {
-    ...FlightDetails
-    price {
-      amount
-      currency
-    }
-  }
-}
-
-mutation BookFlight($flightId: ID!, $passengerId: ID!) {
-  bookFlight(flightId: $flightId, passengerId: $passengerId) {
-    flight {
-      ...FlightDetails
-    }
-  }
-}
+    classDef leftAlign text-align:left,font-family:monospace
+    class Page,Card,Legs,Price leftAlign
 ```
 
 <!-- end_slide -->
 
-# Input types
+# How is GraphQL typesafe for `$MY_LANGUAGE`?
 
-Mutations take data in as well as returning it.
+## Questions you'll be prompting later
 
-```graphql
-type Mutation {
-  bookFlight(input: BookFlightInput!): BookFlightPayload
-}
-
-input BookFlightInput {
-  flightId: ID!
-  passengerId: ID!
-}
-```
-
-<!-- new_line -->
-
-Input types look like object types but only flow one direction — **into** the server.
+(example of SDL -> TypeScript/Swift generation)
 
 <!-- end_slide -->
 
-# Recipe Card: Operations — pass 2
+# How should I secure my deployment?
 
-<!-- column_layout: [1, 1, 1] -->
+## Questions you'll be prompting later
 
-<!-- column: 0 -->
-
-**OPERATION TYPES**
-
-Query
-**Mutation** ←
-Subscription \*
-
-<!-- column: 1 -->
-
-**ANATOMY**
-
-Field
-Selection set
-Argument
-**Variable** ←
-**Fragment** ←
-Alias
-Directive
-
-<!-- column: 2 -->
-
-**CLIENT TOOLING**
-
-Apollo Client
-urql
-Relay
-TanStack Query + graphql-request
-gql.tada
-Houdini
-─────────────────────
-GraphiQL / Apollo Sandbox
-GraphQL LSP (VS Code)
-
-<!-- reset_layout -->
-
-<!-- new_line -->
-
-`* real-time — out of scope today`
+(PQs, depth/rate limiting)
 
 <!-- end_slide -->
 
-# Recipe Card: Schema — pass 2
+# What performance best practices should I mind?
 
-<!-- column_layout: [1, 1, 1] -->
+## Questions you'll be prompting later
 
-<!-- column: 0 -->
-
-**SCHEMA CONCEPTS**
-
-Type
-Field
-Nullability (`!`)
-Resolver
-Schema-first
-Code-first
-
-<!-- column: 1 -->
-
-**SDL TYPES**
-
-Object type
-Scalar
-**Enum** ← \*
-**Interface** ←
-**Union** ←
-**Input type** ←
-
-<!-- column: 2 -->
-
-**SERVERS BY LANGUAGE**
-
-Apollo Server / Yoga (JS/TS)
-Hot Chocolate (.NET)
-Strawberry / Ariadne (Python)
-gqlgen (Go)
-graphql-ruby (Ruby)
-Juniper (Rust)
-Lighthouse (PHP/Laravel)
-
-<!-- reset_layout -->
-
-<!-- new_line -->
-
-`* adding enum values is a breaking change`
+(PQs, client-side and server-side caching, defer)
 
 <!-- end_slide -->
 
-# Two languages in a trenchcoat
+# Resources
 
-<!-- column_layout: [1, 1] -->
-
-<!-- column: 0 -->
-
-**Query language**
-
-for clients
-
-describes what you _want_
-
-```graphql
-query FlightSearch {
-  flights(origin: "JFK") {
-    airline
-    departureTime
-    price {
-      amount
-      currency
-    }
-  }
-}
-```
-
-<!-- column: 1 -->
-
-**SDL**
-
-for servers
-
-defines what's _possible_
-
-```graphql
-type Query {
-  flights(origin: String!): [Flight!]
-}
-
-type Flight {
-  airline: String!
-  departureTime: String!
-  price: Price
-}
-```
-
-<!-- reset_layout -->
-
-<!-- new_line -->
-
-Knowing which one you're in tells you whose job it is.
-In the AI era: knowing the difference makes you a better prompter.
-
-<!-- end_slide -->
-
-# Recipe Card: Production
-
-<!-- column_layout: [2, 1, 2] -->
-
-<!-- column: 0 -->
-
-**FUTURE PROMPT**
-
-"why is my query slow"
-
-"someone is querying my schema"
-
-"nested query took the server down"
-
-"where does authorization go"
-
-"what are my clients running"
-
-"can my AI agent use this API"
-
-<!-- column: 1 -->
-
-**CONCEPT**
-
-Batching
-
-Introspection
-
-Query protection
-
-Authorization
-
-Observability
-
-Agent-readiness
-
-<!-- column: 2 -->
-
-**VOCABULARY**
-
-DataLoader
-
-disable in prod
-
-depth / complexity limiting
-persisted queries / trusted documents
-
-resolver-level auth
-@authenticated / @requiresScopes
-
-Apollo GraphOS / GraphQL Hive / Stellate
-
-MCP + introspection
-
-<!-- reset_layout -->
-
-<!-- end_slide -->
-
-# Fragments — component colocation
-
-Each component owns the fields it needs to render.
-
-```graphql
-fragment PriceBadge_flight on Flight {
-  price {
-    amount
-    currency
-  }
-}
-
-fragment FlightCard_flight on Flight {
-  airline
-  departureTime
-  arrivalTime
-  ...PriceBadge_flight
-}
-
-query FlightSearch {
-  flights(origin: "JFK", destination: "LHR") {
-    ...FlightCard_flight
-  }
-}
-```
-
-<!-- end_slide -->
-
-# Fragment naming convention
-
-`ComponentName_typeName`
-
-<!-- new_line -->
-
-- Tells you **who owns** this fragment
-- Tells you **what type** it's on
-- AI generates anonymous or lazy names — specify the convention explicitly
-
-<!-- new_line -->
-
-Fragments are not abbreviations. **Fragments are contracts.**
-
-When `PriceBadge` changes, one fragment changes. Nothing else breaks.
-
-<!-- end_slide -->
-
-# Further reading
-
-_[QR codes]_
-
-<!-- new_line -->
-
-- Recipe book repo
-- Component-collocated fragments — Relay docs
-- Apollo Federation — federation.dev
-- DataLoader — github.com/graphql/dataloader
-- Persisted queries — your server library's docs
-- N+1 and DataLoader — deep dive
+(TBD)
 
 <!-- end_slide -->

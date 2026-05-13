@@ -1,4 +1,8 @@
 defaults:
   validate_overflows: never
+  theme: pop-punk
 mermaid:
   scale: 4
+options:
+  h1_slide_titles: true
+  list_item_newlines: 2
