@@ -4,14 +4,6 @@ sub_title: an anti-blueprint
 author: Jeff Auriemma
 ---
 
-# TODO
-
-1. Mermaid screenshots
-2. Practice, do dry runs, create a branch incrementally
-3. Fill in blank sections, particularly at the end
-
-<!-- end_slide -->
-
 # Why we're here
 
 🤔
@@ -574,9 +566,18 @@ enum Example {
 
 ## Questions you'll be prompting later
 
-![](pq-diagram.png)
+- Persisted queries / trusted documents
+- Rate/depth limiting
+- Traffic shaping
+- No introspection in production
 
-(PQs, depth/rate limiting)
+<!-- end_slide -->
+
+# How should I secure my deployment?
+
+## Questions you'll be prompting later
+
+![](pq-diagram.png)
 
 <!-- end_slide -->
 
@@ -584,7 +585,11 @@ enum Example {
 
 ## Questions you'll be prompting later
 
-(PQs, client-side and server-side caching, defer)
+- Persisted queries / trusted documents
+- DataLoader (N+1 problem)
+- Client-side caching
+- Server/router-side caching
+- Incremental delivery
 
 <!-- end_slide -->
 
@@ -592,12 +597,22 @@ enum Example {
 
 ## Questions you'll be prompting later
 
-(Apollo MCP server, other MCP servers, semantic introspection, Skills)
+- OSS GraphQL MCP Servers are out there
+- OSS Agent Skills for GraphQL are available
+- Semantic Introspection is an exciting development
+- MCP Tools for various GraphQL tools
 
 <!-- end_slide -->
 
-# Resources
+# Slides
 
-(TBD)
+![](qr.png)
 
 <!-- end_slide -->
+
+# Thanks!
+
+- GraphQL Foundation and TSC
+- Apidays / FOST / Mehdi for partnering
+- Apollo for funding my travel and lodging here
+- Everyone here today for making this a reality
