@@ -10,6 +10,8 @@ author: Jeff Auriemma
 2. Practice, do dry runs, create a branch incrementally
 3. Fill in blank sections, particularly at the end
 
+<!-- end_slide -->
+
 # Why we're here
 
 🤔
@@ -25,6 +27,10 @@ We want to make...
 - better agents
 
 **GraphQL** is the investment to make in 2026
+
+<!-- end_slide -->
+
+# I need your help
 
 <!-- end_slide -->
 
@@ -102,7 +108,7 @@ The response mirrors the shape of the query.
 
 # Introducing myself
 
-<!-- column_layout: [1, 1] -->
+<!-- column_layout: [2, 1] -->
 
 <!-- column: 0 -->
 
@@ -223,6 +229,52 @@ type Price {
 <!-- new_line -->
 
 Every field selected in the query has a definition here. The schema defines what's _possible_; the query picks what it _wants_.
+
+<!-- end_slide -->
+
+# Descriptions
+
+<!-- column_layout: [3, 2] -->
+
+<!-- column: 0 -->
+
+```graphql
+"A scheduled airline flight between two airports."
+type Flight {
+  "Two-letter IATA code, e.g. `AA`, `BA`."
+  airline: String!
+
+  "ISO 8601 timestamp in the origin airport's local time."
+  departureTime: String!
+
+  """
+  All segments of the journey, in order.
+  A direct flight has exactly one leg.
+  """
+  legs: [Leg!]!
+
+  "Null when pricing isn't available for this passenger."
+  price: Price
+}
+```
+
+<!-- column: 1 -->
+
+**`"..."`** — single-line description
+
+**`"""..."""`** — multi-line, markdown-friendly
+
+Lives on **types**, **fields**, **arguments**, **enum values** — anywhere in the schema
+
+**Introspectable** — IDEs, codegen, docs, and agents all read it
+
+**Lintable**: enforce descriptions to make sure your API is well-annotated
+
+<!-- reset_layout -->
+
+<!-- new_line -->
+
+In 2026 your schema is read by humans **and** agents. A well-described schema is a well-prompted agent.
 
 <!-- end_slide -->
 
@@ -434,13 +486,95 @@ flowchart TB
 
 ## Questions you'll be prompting later
 
-(example of SDL -> TypeScript/Swift generation)
+<!-- column_layout: [1, 1] -->
+
+<!-- column: 0 -->
+
+```graphql
+# FlightSearch.graphql
+query FlightSearch($origin: String!) {
+  flights(origin: $origin) {
+    airline
+    departureTime
+    legs {
+      airport
+      duration
+    }
+  }
+}
+```
+
+<!-- column: 1 -->
+
+```swift
+// FlightSearchQuery.swift  (generated)
+class FlightSearchQuery: GraphQLQuery {
+  let origin: String
+
+  struct Data: SelectionSet {
+    let flights: [Flight]
+
+    struct Flight: SelectionSet {
+      let airline: String
+      let departureTime: String
+      let legs: [Leg]
+
+      struct Leg: SelectionSet {
+        let airport: String
+        let duration: Int
+      }
+    }
+  }
+}
+```
+
+<!-- reset_layout -->
+
+<!-- new_line -->
+
+Code generation tools read your GraphQL operations + the schema and emit strongly-typed code (in this case: Swift). Change the query, regenerate, the compiler catches every broken consumer.
+
+<!-- end_slide -->
+
+# How is GraphQL typesafe for `$MY_LANGUAGE`?
+
+## Questions you'll be prompting later
+
+> [!CAUTION]
+> Some additions may not be backwards compatible with clients.  Even `enum` additions!
+
+<!-- column_layout: [1, 1] -->
+
+<!-- column: 0 -->
+
+```graphql
+# V1
+enum Example {
+  FOO
+  BAR
+}
+```
+
+<!-- column: 1 -->
+
+```graphql
+# V2
+enum Example {
+  FOO
+  BAR
+  BAZ
+}
+```
+
+<!-- reset_layout -->
 
 <!-- end_slide -->
 
 # How should I secure my deployment?
 
 ## Questions you'll be prompting later
+
+![](pq-diagram.png)
 
 (PQs, depth/rate limiting)
 
@@ -451,6 +585,14 @@ flowchart TB
 ## Questions you'll be prompting later
 
 (PQs, client-side and server-side caching, defer)
+
+<!-- end_slide -->
+
+# How do I practice context engineering with GraphQL?
+
+## Questions you'll be prompting later
+
+(Apollo MCP server, other MCP servers, semantic introspection, Skills)
 
 <!-- end_slide -->
 
