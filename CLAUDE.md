@@ -9,6 +9,10 @@ operations (queries and mutations) are layered on top.
 The repo is intentionally minimal so the audience watches code being written, not
 read. Bootstrapped files exist only where they would be a distraction to type live.
 
+## Available Skills
+
+Use `graphql-operations` to write queries/mutations, `graphql-schema` to write schema code, and `apollo-server` to write resolvers.
+
 ## Layout
 
 This is an npm workspaces monorepo. Each top-level directory below is a workspace
