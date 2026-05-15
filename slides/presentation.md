@@ -266,7 +266,7 @@ Lives on **types**, **fields**, **arguments**, **enum values** — anywhere in t
 
 <!-- new_line -->
 
-In 2026 your schema is read by humans **and** agents. A well-described schema is a well-prompted agent.
+In 2026 your schema is read by humans **and** agents. A well-described schema is a well-prompted agent.  Special directives such as `@deprecated` further enrich schemas.
 
 <!-- end_slide -->
 
@@ -450,9 +450,9 @@ With your agent...
 
 <!-- end_slide -->
 
-# How should I use fragments?
-
 ## Questions you'll be prompting later
+
+# How should I use fragments?
 
 ```mermaid +render
 flowchart TB
@@ -474,9 +474,9 @@ flowchart TB
 
 <!-- end_slide -->
 
-# How is GraphQL typesafe for `$MY_LANGUAGE`?
-
 ## Questions you'll be prompting later
+
+# How is GraphQL typesafe for `$MY_LANGUAGE`?
 
 <!-- column_layout: [1, 1] -->
 
@@ -528,9 +528,9 @@ Code generation tools read your GraphQL operations + the schema and emit strongl
 
 <!-- end_slide -->
 
-# How is GraphQL typesafe for `$MY_LANGUAGE`?
-
 ## Questions you'll be prompting later
+
+# How is GraphQL typesafe for `$MY_LANGUAGE`?
 
 > [!CAUTION]
 > Some additions may not be backwards compatible with clients.  Even `enum` additions!
@@ -562,26 +562,29 @@ enum Example {
 
 <!-- end_slide -->
 
-# How should I secure my deployment?
-
 ## Questions you'll be prompting later
+
+# How should I secure my deployment?
 
 - Persisted queries / trusted documents
 - Rate/depth limiting
-- Traffic shaping
 - No introspection in production
 
 <!-- end_slide -->
 
-# How should I secure my deployment?
-
 ## Questions you'll be prompting later
+
+# How should I secure my deployment?
 
 ![](pq-diagram.png)
 
+<!-- alignment: center -->
+
+_Persisted Queries / Trusted Documents architecture_
+
 <!-- end_slide -->
 
-# What performance best practices should I mind?
+# What techniques are good for performance and stability?
 
 ## Questions you'll be prompting later
 
@@ -590,6 +593,7 @@ enum Example {
 - Client-side caching
 - Server/router-side caching
 - Incremental delivery
+- Traffic shaping
 
 <!-- end_slide -->
 
@@ -604,9 +608,25 @@ enum Example {
 
 <!-- end_slide -->
 
-# Slides
+# Steal these slides
+
+<!-- column_layout: [1, 2] -->
+
+<!-- column: 0 -->
+
+## Repo
 
 ![](qr.png)
+
+<!-- column: 1 -->
+
+## Resources
+
+- GraphQL.org/learn
+- Apollo Odyssey
+- https://graphql.org/community/training-courses/
+
+<!-- reset_layout -->
 
 <!-- end_slide -->
 
